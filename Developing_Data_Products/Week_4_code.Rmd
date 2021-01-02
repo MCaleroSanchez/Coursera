@@ -1,0 +1,100 @@
+---
+title: "Code_App_Shiny"
+author: "M"
+date: "2/1/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+# load libraries
+library(ggplot2)
+library(shiny)
+library(dplyr)
+
+# load iris dataset locally
+
+#iris <- read.csv("Iris.csv")
+iris <- iris
+# create a summary of each species and save as separate dataframe
+iris_summary <- iris %>%
+  group_by(Species) %>%
+  summarise("Average sepal length" = mean(Sepal.Length),
+            "Average sepal width" = mean(Sepal.Width),
+            "Average petal length" = mean(Petal.Length),
+            "Average petal length" = mean(Petal.Width))
+
+ui <- fluidPage(
+  # title of the page
+  titlePanel("Iris data set visualization in Shiny"),
+  sidebarLayout(
+    sidebarPanel(
+      # Select variable for y-axis
+      selectInput(
+        inputId = "y",
+        label = "y-axis",
+        choices = c("Sepal.Length", "Sepal.Width", "Petal.Length", "Petal.Width"),
+        selected = "Sepal.Length"
+      ),
+      
+      # Select variable for x-axis
+      selectInput(
+        inputId = "x",
+        label = "x-axis",
+        choices = c("Sepal.Length", "Sepal.Width", "Petal.Length", "Petal.Width"),
+        selected = "Sepal.Width"
+      ),
+      
+      # select species to be dynamically displayed in graph, by default all species are selected
+      checkboxGroupInput(
+        inputId = "species",
+        label = "Select Species", 
+        choices = c("setosa", "versicolor", "virginica"),
+        selected = c("setosa", "versicolor", "virginica")
+      )
+    ),
+    
+    
+    mainPanel(
+      tags$h3("Scatter Plot"), 
+      plotOutput(outputId = "scatterplot"),
+      tags$h2("Data Table"), 
+      tableOutput('table')
+      
+    )
+    
+    
+  )
+)
+
+
+server <- function(input, output) {
+  # create a reactive dataframe to help with visualization
+  df <- reactive({
+    iris %>%
+      filter(Species %in% input$species)
+  })
+  
+  # table of summary data
+  output$table <- renderTable(iris_summary)
+  
+  # scatter plot of species data
+  output$scatterplot <- renderPlot({
+    ggplot(
+      df(), 
+      aes_string(x = input$x, y = input$y)) + 
+      geom_point(aes(col = df()$Species), size=3) + scale_color_discrete(name ="Species") +
+      geom_smooth(aes(group=df()$Species, color = df()$Species), method='lm')
+  
+  
+  })
+  
+  
+}
+
+# combine ui and server in a shinyApp
+shinyApp(ui = ui, server = server)
+```
