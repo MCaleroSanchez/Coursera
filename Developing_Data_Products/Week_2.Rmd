@@ -1,0 +1,54 @@
+---
+title: "Week_2_data_products"
+author: "M"
+date: "2/1/2021"
+output:
+  beamer_presentation: default
+  ioslides_presentation: default
+  slidy_presentation: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+```{r}
+#install.packages('leaflet')
+library(leaflet)
+set.seed(2020-12-25)
+
+my_map<-leaflet() %>%  addTiles()
+
+
+WHIcon <- makeIcon(
+  iconUrl = "https://goo.gl/maps/DdjV3X5pzJ12",
+  iconWidth = 31*215/230, iconHeight = 31,
+  iconAnchorX = 31*215/230/2, iconAnchorY = 16
+)
+
+photoLink<-"<a href='https://goo.gl/maps/DdjV3X5pzJ12'>White House photo </a>"
+website<- "<a href='https://www.whitehouse.gov/'>The White House </a>"
+
+my_map <- my_map %>%
+  addMarkers(lat=38.8976771, lng=-77.0367341,
+             popup=photoLink) 
+
+my_map
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
